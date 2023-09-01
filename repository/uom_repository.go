@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"go-laundry/model"
 )
 
@@ -10,21 +11,51 @@ type UomRepository interface {
 	FindById(id string) (model.Uom, error) // SELECT by id
 	FindAll() ([]model.Uom, error)         // SELECT *
 	Update(uom model.Uom) error
-	DeleteById(id string) // DELETE FROM apa WHERE id = ?
+	DeleteById(id string) error // DELETE FROM table WHERE id = ?
 }
 
 type uomRepository struct {
 	db *sql.DB
 }
 
-// DeleteById implements UomRepository.
-func (u *uomRepository) DeleteById(id string) {
-	panic("unimplemented")
+// Save implements UomRepository.
+func (u *uomRepository) Save(uom model.Uom) error {
+	_, err := u.db.Exec("INSERT INTO uom VALUES ($1, $2)", uom.Id, uom.Name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *uomRepository) DeleteById(id string) error {
+	_, err := u.db.Exec("DELETE FROM uom WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // FindAll implements UomRepository.
 func (u *uomRepository) FindAll() ([]model.Uom, error) {
-	panic("unimplemented")
+	rows, err := u.db.Query("SELECT * FROM uom")
+	if err != nil {
+		return nil, err
+	}
+
+	var uoms []model.Uom
+	for rows.Next() {
+		var uom model.Uom
+		err := rows.Scan(&uom.Id, &uom.Name)
+		if err != nil {
+			return nil, err
+		}
+		uoms = append(uoms, uom)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+	return uoms, nil
 }
 
 // FindById implements UomRepository.
@@ -38,18 +69,15 @@ func (u *uomRepository) FindById(id string) (model.Uom, error) {
 	return uom, nil
 }
 
-// Save implements UomRepository.
-func (u *uomRepository) Save(uom model.Uom) error {
-	_, err := u.db.Exec("INSERT INTO uom VALUES ($1, $2)", uom.Id, uom.Name)
+// Update implements UomRepository.
+func (u *uomRepository) Update(uom model.Uom) error {
+	// panic("unimplemented")
+	_, err := u.db.Exec("UPDATE uom SET name = $2 WHERE id = $1", uom.Id, uom.Name)
 	if err != nil {
 		return err
 	}
+	fmt.Printf("Uom with id %s, succsessfully updated!\n", uom.Id)
 	return nil
-}
-
-// Update implements UomRepository.
-func (u *uomRepository) Update(uom model.Uom) error {
-	panic("unimplemented")
 }
 
 func NewUomRepository(db *sql.DB) UomRepository {

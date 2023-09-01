@@ -3,14 +3,10 @@ package main
 import (
 	"fmt"
 	"go-laundry/config"
+	"go-laundry/model"
+	"go-laundry/repository"
+	"go-laundry/usecase"
 )
-
-type Customer struct {
-	Id          string
-	Name        string
-	PhoneNumber string
-	Address     string
-}
 
 func main() {
 	cfg, err := config.NewConfig()
@@ -24,24 +20,15 @@ func main() {
 	}
 	db := con.Conn()
 
-	customer := Customer{
-		Id:          "1",
-		Name:        "Budi",
-		PhoneNumber: "081234567",
-		Address:     "JL. H. Dahlan 75",
-	}
-
-	_, err = db.Exec("INSERT INTO customer VALUES ($1, $2, $3, $4)",
-		customer.Id,
-		customer.Name,
-		customer.PhoneNumber,
-		customer.Address,
-	)
-
+	cstRepo := repository.NewCustomerRepository(db)
+	cstUC := usecase.NewCustomerUseCase(cstRepo)
+	err = cstUC.CreateNew(model.Customer{
+		Id:          "3",
+		Name:        "Andi",
+		PhoneNumber: "0868687907",
+		Address:     "Jakarta",
+	})
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println("Succes Inserting data")
-
 }
