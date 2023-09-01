@@ -10,9 +10,10 @@ import (
 )
 
 type Console struct {
-	// Tempat untuk menaruh semua usecase yg dibutuhkan
-	uomUC     usecase.UomUseCase
-	productUC usecase.ProductUseCase
+	uomUC      usecase.UomUseCase
+	productUC  usecase.ProductUseCase
+	customer   usecase.CustomerUseCase
+	employeeUC usecase.EmployeeUseCase
 }
 
 func (c *Console) showMainMenu() {

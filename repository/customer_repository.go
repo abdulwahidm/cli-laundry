@@ -30,7 +30,7 @@ func (c *customerRepository) Update(customer model.Customer) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("update repo customer")
+	fmt.Println("update customer")
 	return nil
 }
 
