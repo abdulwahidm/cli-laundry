@@ -22,6 +22,7 @@ type productUseCase struct {
 
 // CreateNew implements ProductUseCase.
 func (p *productUseCase) CreateNew(payload model.Product) error {
+	// Handler id tidak duplicat dilakukan pada db constraint uniqe
 	if payload.Id == "" {
 		return fmt.Errorf("id is required")
 	}
@@ -74,7 +75,34 @@ func (p *productUseCase) GetByName(name string) ([]model.Product, error) {
 
 // Update implements ProductUseCase.
 func (p *productUseCase) Update(payload model.Product) error {
-	panic("unimplemented")
+	if payload.Id == "" {
+		return fmt.Errorf("id is required")
+	}
+
+	if payload.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+
+	if payload.Price <= 0 {
+		return fmt.Errorf("price must be greater than zero")
+	}
+
+	_, err := p.uomUseCase.FindById(payload.Uom.Id)
+	if err != nil {
+		return err
+	}
+
+	_, err = p.FindById(payload.Id)
+	if err != nil {
+		return err
+	}
+
+	err = p.repo.Update(payload)
+	if err != nil {
+		return fmt.Errorf("failed to update product: %v", err)
+	}
+
+	return nil
 }
 
 func NewProductUseCase(repo repository.ProductRepository, uom UomUseCase) ProductUseCase {

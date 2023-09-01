@@ -11,6 +11,7 @@ type CustomerRepository interface {
 	FindAll() ([]model.Customer, error)
 	FindById(id string) (model.Customer, error)
 	FindByName(name string) (model.Customer, error)
+	Update(customer model.Customer) error
 	DeleteById(id string) error
 }
 
@@ -18,9 +19,28 @@ type customerRepository struct {
 	db *sql.DB
 }
 
+// Update implements CustomerRepository.
+func (c *customerRepository) Update(customer model.Customer) error {
+	_, err := c.db.Exec("UPDATE customer SET name = $2, phone_number = $3,address = $4 WHERE id = $1",
+		customer.Id,
+		customer.Name,
+		customer.PhoneNumber,
+		customer.Address,
+	)
+	if err != nil {
+		return err
+	}
+	fmt.Println("update repo customer")
+	return nil
+}
+
 // DeleteById implements CustomerRepository.
 func (c *customerRepository) DeleteById(id string) error {
-	panic("unimplemented")
+	_, err := c.db.Exec("DELETE FROM customer WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // FindAll implements CustomerRepository.
@@ -47,7 +67,13 @@ func (c *customerRepository) FindAll() ([]model.Customer, error) {
 
 // FindById implements CustomerRepository.
 func (c *customerRepository) FindById(id string) (model.Customer, error) {
-	panic("unimplemented")
+	row := c.db.QueryRow("SELECT * FROM customer WHERE id = $1", id)
+	var customer model.Customer
+	err := row.Scan(&customer.Id, &customer.Name, &customer.PhoneNumber, &customer.Address)
+	if err != nil {
+		return model.Customer{}, err
+	}
+	return customer, nil
 }
 
 // FindByName implements CustomerRepository.
@@ -57,8 +83,7 @@ func (c *customerRepository) FindByName(name string) (model.Customer, error) {
 
 // Save implements CustomerRepository.
 func (c *customerRepository) Save(customer model.Customer) error {
-	_, err := c.db.Exec("INSERT INTO customer VALUES ($1, $2, $3, $4)",
-		customer.Id, customer.Name, customer.PhoneNumber, customer.Address)
+	_, err := c.db.Exec("INSERT INTO customer VALUES ($1, $2, $3, $4)", customer.Id, customer.Name, customer.PhoneNumber, customer.Address)
 	if err != nil {
 		fmt.Println("error from db")
 		return err

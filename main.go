@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"go-laundry/config"
-	"go-laundry/model"
 	"go-laundry/repository"
 	"go-laundry/usecase"
 )
@@ -20,15 +19,11 @@ func main() {
 	}
 	db := con.Conn()
 
-	cstRepo := repository.NewCustomerRepository(db)
-	cstUC := usecase.NewCustomerUseCase(cstRepo)
-	err = cstUC.CreateNew(model.Customer{
-		Id:          "3",
-		Name:        "Andi",
-		PhoneNumber: "0868687907",
-		Address:     "Jakarta",
-	})
+	empRepo := repository.NewEmployeeRepository(db)
+	empUC := usecase.NewEmployeeUseCase(empRepo)
+	employees, err := empUC.GetByName("Caca")
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println(employees)
 }

@@ -12,7 +12,7 @@ type CustomerUseCase interface {
 	FindAll() ([]model.Customer, error)
 	GetByName(name string) ([]model.Customer, error)
 	Update(payload model.Customer) error
-	DeleteById(id string) error
+	Delete(id string) error
 }
 
 type customerUseCase struct {
@@ -35,12 +35,21 @@ func (c *customerUseCase) CreateNew(payload model.Customer) error {
 	}
 	fmt.Println("New customer has been added")
 	return nil
-
 }
 
 // DeleteById implements CustomerUseCase.
-func (c *customerUseCase) DeleteById(id string) error {
-	panic("unimplemented")
+func (c *customerUseCase) Delete(id string) error {
+	_, err := c.FindById(id)
+	if err != nil {
+		return err
+	}
+
+	err = c.repo.DeleteById(id)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Customer with id: %s deleted", id)
+	return nil
 }
 
 // FindAll implements CustomerUseCase.
@@ -50,7 +59,11 @@ func (c *customerUseCase) FindAll() ([]model.Customer, error) {
 
 // FindById implements CustomerUseCase.
 func (c *customerUseCase) FindById(id string) (model.Customer, error) {
-	panic("unimplemented")
+	customer, err := c.repo.FindById(id)
+	if err != nil {
+		return model.Customer{}, fmt.Errorf("customer with id: %s not found.", id)
+	}
+	return customer, nil
 }
 
 // GetByName implements CustomerUseCase.
@@ -60,7 +73,19 @@ func (c *customerUseCase) GetByName(name string) ([]model.Customer, error) {
 
 // Update implements CustomerUseCase.
 func (c *customerUseCase) Update(payload model.Customer) error {
-	panic("unimplemented")
+	_, err := c.FindById(payload.Id)
+	if err != nil {
+		return err
+	}
+	if payload.Id == "" || payload.Name == "" || payload.PhoneNumber == "" {
+		return fmt.Errorf("data is required")
+	}
+
+	err = c.repo.Update(payload)
+	if err != nil {
+		return fmt.Errorf("failed to update uom: %v", err)
+	}
+	return nil
 }
 
 func NewCustomerUseCase(repo repository.CustomerRepository) CustomerUseCase {
