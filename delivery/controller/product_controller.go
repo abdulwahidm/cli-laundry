@@ -42,7 +42,7 @@ func (u *ProductController) ProductMenu() {
 	}
 }
 
-func (u *ProductController) insertFormProduct() {
+func (p *ProductController) insertFormProduct() {
 	var product model.Product
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -64,7 +64,7 @@ func (u *ProductController) insertFormProduct() {
 	scanner.Scan()
 	product.Uom.Id = scanner.Text()
 
-	err := u.productUC.CreateNew(product)
+	err := p.productUC.CreateNew(product)
 	if err != nil {
 		fmt.Println(err)
 	} else {
@@ -72,8 +72,8 @@ func (u *ProductController) insertFormProduct() {
 	fmt.Println("New product has been added..")
 }
 
-func (u *ProductController) showListFormProduct() {
-	products, err := u.productUC.FindAll()
+func (p *ProductController) showListFormProduct() {
+	products, err := p.productUC.FindAll()
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -87,7 +87,7 @@ func (u *ProductController) showListFormProduct() {
 	}
 }
 
-func (u *ProductController) updateFormProduct() {
+func (p *ProductController) updateFormProduct() {
 	var product model.Product
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -107,7 +107,7 @@ func (u *ProductController) updateFormProduct() {
 	scanner.Scan()
 	product.Uom.Id = scanner.Text()
 
-	err := u.productUC.Update(product)
+	err := p.productUC.Update(product)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -124,16 +124,16 @@ func (u *ProductController) FindByNameFormProduct() {
 		fmt.Println(err)
 	}
 	for _, product := range products {
-		fmt.Println("ID :", product.Id, "Name : ", product.Name)
+		fmt.Println(product)
 	}
 
 }
 
-func (u *ProductController) DeleteFormProduct() {
+func (p *ProductController) DeleteFormProduct() {
 	var id string
 	fmt.Printf("Input id to deleted: ")
 	fmt.Scanln(&id)
-	err := u.productUC.Delete(id)
+	err := p.productUC.Delete(id)
 	if err != nil {
 		fmt.Println(err)
 	}

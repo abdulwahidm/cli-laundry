@@ -40,8 +40,9 @@ func (c *Console) Run() {
 		case "2":
 			controller.NewProductController(c.productUC).ProductMenu()
 		case "3":
-			// controller.New
+			controller.NewCustomerController(c.customerUC).CustomerMenu()
 		case "4":
+			controller.NewEmployeeController(c.employeeUC).EmployeeMenu()
 		case "5":
 		case "6":
 			os.Exit(0)

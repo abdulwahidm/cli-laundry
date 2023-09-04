@@ -12,8 +12,8 @@ type CustomerController struct {
 	customerUC usecase.CustomerUseCase
 }
 
-func (u *CustomerController) CustomerMenu() {
-	fmt.Println("========== Master UOM ==========\v")
+func (c *CustomerController) CustomerMenu() {
+	fmt.Println("========== Master Customer ==========\v")
 	fmt.Println("1. Add New Customer")
 	fmt.Println("2. View All Customer")
 	fmt.Println("3. Update Customer ")
@@ -27,15 +27,15 @@ func (u *CustomerController) CustomerMenu() {
 
 	switch selectMenuCustomer {
 	case "1":
-		u.insertFormCustomer()
+		c.insertFormCustomer()
 	case "2":
-		u.showListFormCustomer()
+		c.showListFormCustomer()
 	case "3":
-		u.updateFormCustomer()
+		c.updateFormCustomer()
 	case "4":
-		u.DeleteFormCustomer()
+		c.DeleteFormCustomer()
 	case "5":
-		u.FindByNameFormCustomer()
+		c.FindByNameFormCustomer()
 	case "6":
 		return
 	}
@@ -70,8 +70,8 @@ func (c *CustomerController) insertFormCustomer() {
 	fmt.Println("New customer has been added..")
 }
 
-func (u *CustomerController) showListFormCustomer() {
-	customers, err := u.customerUC.FindAll()
+func (c *CustomerController) showListFormCustomer() {
+	customers, err := c.customerUC.FindAll()
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -85,7 +85,7 @@ func (u *CustomerController) showListFormCustomer() {
 	}
 }
 
-func (u *CustomerController) updateFormCustomer() {
+func (c *CustomerController) updateFormCustomer() {
 	var customer model.Customer
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -104,7 +104,7 @@ func (u *CustomerController) updateFormCustomer() {
 	scanner.Scan()
 	customer.Address = scanner.Text()
 
-	err := u.customerUC.Update(customer)
+	err := c.customerUC.Update(customer)
 	if err != nil {
 		fmt.Println(err)
 	}
