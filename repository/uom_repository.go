@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 	"go-laundry/model"
 )
 
@@ -11,11 +10,39 @@ type UomRepository interface {
 	FindById(id string) (model.Uom, error) // SELECT by id
 	FindAll() ([]model.Uom, error)         // SELECT *
 	Update(uom model.Uom) error
+	FindByName(name string) ([]model.Uom, error)
 	DeleteById(id string) error // DELETE FROM table WHERE id = ?
 }
 
 type uomRepository struct {
 	db *sql.DB
+}
+
+// FindByName implements UomRepository.
+func (u *uomRepository) FindByName(name string) ([]model.Uom, error) {
+	query := ("SELECT * FROM uom WHERE name ILIKE '%" + name + "%';")
+	// fmt.Println(query)
+	rows, err := u.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	var uoms []model.Uom
+	for rows.Next() {
+		uom := model.Uom{}
+		err := rows.Scan(
+			&uom.Id,
+			&uom.Name,
+		)
+		if err != nil {
+			return nil, err
+		}
+		uoms = append(uoms, uom)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+	return uoms, nil
 }
 
 // Save implements UomRepository.
@@ -76,7 +103,6 @@ func (u *uomRepository) Update(uom model.Uom) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Uom with id %s, succsessfully updated!\n", uom.Id)
 	return nil
 }
 

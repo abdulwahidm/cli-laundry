@@ -50,7 +50,6 @@ func (p *productUseCase) Delete(id string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Product with id: %s has been deleted\n", id)
 	return nil
 }
 

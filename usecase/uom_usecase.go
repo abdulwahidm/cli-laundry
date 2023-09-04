@@ -10,12 +10,25 @@ type UomUseCase interface {
 	CreateNew(payload model.Uom) error
 	FindById(id string) (model.Uom, error)
 	FindAll() ([]model.Uom, error)
+	FindByName(name string) ([]model.Uom, error)
 	Update(payload model.Uom) error
 	Delete(id string) error
 }
 
 type uomUseCase struct {
 	repo repository.UomRepository
+}
+
+// FindByName implements UomUseCase.
+func (u *uomUseCase) FindByName(name string) ([]model.Uom, error) {
+	rows, err := u.repo.FindByName(name)
+	if err != nil {
+		return nil, err
+	}
+	if len(rows) < 0 {
+		return nil, fmt.Errorf("Name of uoms is not available")
+	}
+	return rows, nil
 }
 
 // CreateNew implements UomUseCase.
@@ -26,7 +39,6 @@ func (u *uomUseCase) CreateNew(payload model.Uom) error {
 	if payload.Name == "" {
 		return fmt.Errorf("name is required")
 	}
-	fmt.Println("New uom has been saved")
 	return u.repo.Save(payload)
 }
 
@@ -41,7 +53,6 @@ func (u *uomUseCase) Delete(id string) error {
 	if err != nil {
 		return fmt.Errorf("failed to delete uom: %v", err)
 	}
-	fmt.Printf("Uom with id %s has been deleted\n", id)
 	return nil
 }
 
